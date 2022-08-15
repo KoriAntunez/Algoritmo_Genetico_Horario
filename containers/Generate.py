@@ -1,3 +1,4 @@
+#Importación de libreria
 from PyQt5 import QtCore, QtWidgets
 from components import Database as db, ResourceTracker, ScheduleParser, ScenarioComposer, GeneticAlgorithm
 from py_ui import Generate as Parent
@@ -6,21 +7,21 @@ from numpy import mean
 import pickle
 import copy
 
-
+#
 class Generate:
     def __init__(self):
         self.totalResource = {
             'cpu': [],
-            'memory': []
+            'memoria': []
         }
         self.tick = 0
         self.data = {
-            'results': [],
-            'rooms': [],
-            'instructors': [],
-            'sections': [],
-            'sharings': [],
-            'subjects': []
+            'resultados': [],
+            'aulas': [],
+            'instructores': [],
+            'secciones': [],
+            'reuniones': [],
+            'materias': []
         }
         self.topChromosomes = []
         self.meta = []
@@ -45,7 +46,7 @@ class Generate:
         parent.btnStop.clicked.connect(self.stopOperation)
         parent.chkPreview.clicked.connect(self.togglePreview)
         parent.cmbSection.clear()
-        for section, details in self.data['sections'].items():
+        for section, details in self.data['secciones'].items():
             self.sectionKeys.append(section)
             parent.cmbSection.addItem(details[0])
         parent.cmbSection.currentIndexChanged.connect(self.changePreview)
@@ -96,15 +97,15 @@ class Generate:
         data = []
         if not len(self.topChromosomes) or not self.preview:
             return False
-        sections = self.topChromosomes[0][0].data['sections']
+        secciones = self.topChromosomes[0][0].data['secciones']
         rawData = self.data
-        subjects = sections[self.sectionKeys[index]]['details']
-        for subject, details in subjects.items():
+        materias = secciones[self.sectionKeys[index]]['details']
+        for subject, details in materias.items():
             if not len(details):
                 continue
-            instructor = '' if not details[1] else rawData['instructors'][details[1]][0]
-            data.append({'color': None, 'text': '{} \n {} \n {}'.format(rawData['subjects'][subject][0],
-                                                                        rawData['rooms'][details[0]][0],
+            instructor = '' if not details[1] else rawData['instructores'][details[1]][0]
+            data.append({'color': None, 'text': '{} \n {} \n {}'.format(rawData['materias'][subject][0],
+                                                                        rawData['aulas'][details[0]][0],
                                                                         instructor),
                          'instances': [[day, details[3], details[3] + details[4]] for day in details[2]]})
         self.loadTable(data)
@@ -121,7 +122,7 @@ class Generate:
 
     def updateTime(self):
         self.time = self.time.addSecs(1)
-        self.parent.lblTime.setText('Elapsed Time: {}'.format(self.time.toString('hh:mm:ss')))
+        self.parent.lblTime.setText('Tiempo transcurrido: {}'.format(self.time.toString('hh:mm:ss')))
 
     def stopOperation(self):
         self.toggleState(False)
@@ -134,15 +135,15 @@ class Generate:
             self.parent.btnStop.clicked.disconnect(self.stopOperation)
             self.parent.btnStop.clicked.connect(self.dialog.close)
             self.parent.lblCPU.setText('CPU Usage: Stopped')
-            self.parent.lblMemory.setText('Memory Usage: Stopped')
+            self.parent.lblmemoria.setText('memoria Usage: Stopped')
             self.parent.lblStatus.setText('Status: Stopped')
             self.totalResource['cpu'] = mean(self.totalResource['cpu'])
-            self.totalResource['memory'] = mean(self.totalResource['memory'])
+            self.totalResource['memoria'] = mean(self.totalResource['memoria'])
             self.meta = [[chromosome[1], chromosome[0].fitnessDetails] for chromosome in
                          self.topChromosomes]
             conn = db.getConnection()
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO results (content) VALUES (?)', [Binary(
+            cursor.execute('INSERT INTO resultados (content) VALUES (?)', [Binary(
                 pickle.dumps({'data': [chromosome[0].data for chromosome in self.topChromosomes],
                               'meta': self.meta,
                               'time': self.time.toString('hh:mm:ss'),
@@ -160,7 +161,7 @@ class Generate:
             self.tick = 0
         else:
             self.totalResource['cpu'].append(resource[0])
-            self.totalResource['memory'].append(resource[1][1])
+            self.totalResource['memoria'].append(resource[1][1])
         self.parent.lblCPU.setText('CPU Usage: {}%'.format(resource[0]))
         self.parent.lblMemory.setText('Memory Usage: {}% - {} MB'.format(resource[1][0], resource[1][1]))
 
@@ -181,7 +182,7 @@ class ResourceTrackerWorker(QtCore.QThread):
             self.sleep(1)
             if self.running is True:
                 cpu = ResourceTracker.getCPUUsage()
-                memory = ResourceTracker.getMemoryUsage()
-                memory = [ResourceTracker.getMemoryPercentage(memory), ResourceTracker.byteToMegabyte(memory[0])]
-                self.signal.emit([cpu, memory])
+                memoria = ResourceTracker.getMemoryUsage()
+                memoria = [ResourceTracker.getMemoryPercentage(memoria), ResourceTracker.byteToMegabyte(memoria[0])]
+                self.signal.emit([cpu, memoria])
         return True
