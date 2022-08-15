@@ -227,5 +227,5 @@ class MainWindow(Main.Ui_MainWindow):
 
     def new(self):
         ioHandler.removeTables()
-        Database.setup()
+        Database.configuracion()
         self.tabListener(0)

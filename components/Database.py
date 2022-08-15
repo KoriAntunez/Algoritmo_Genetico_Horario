@@ -1,9 +1,11 @@
 import sqlite3
 
-
-def checkSetup():
+# 
+def verConfiguracion():
+  # crear una conexión con una base de datos
     conn = sqlite3.connect('gas.db')
     cursor = conn.cursor()
+    # se muestra al iniciar la sección profesores
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='instructors'")
     result = cursor.fetchone()
     conn.close()
@@ -11,8 +13,9 @@ def checkSetup():
         return False
     return True
 
-
-def setup():
+# Se configura la creación de tablas
+def configuracion():
+  # crear una conexión con una base de datos
     conn = sqlite3.connect('gas.db')
     cursor = conn.cursor()
     create_instructors_table = """
