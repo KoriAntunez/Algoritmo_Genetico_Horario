@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtWidgets
-from components import Database as db, ResourceTracker, ScheduleParser, ScenarioComposer, GeneticAlgorithm
+from components import Database as db, ResourceTracker, ScheduleParser, ScenarioComposer, AlgoritmoGenetico
 from py_ui import Generate as Parent
 from sqlite3 import Binary
 from numpy import mean
@@ -68,7 +68,7 @@ class Generate:
         self.resourceWorker = ResourceTrackerWorker()
         self.resourceWorker.signal.connect(self.updateResource)
         self.resourceWorker.start()
-        self.geneticAlgorithm = GeneticAlgorithm.GeneticAlgorithm(self.data)
+        self.geneticAlgorithm = AlgoritmoGenetico.AlgoritmoGenetico(self.data)
         self.geneticAlgorithm.statusSignal.connect(self.updateStatus)
         self.geneticAlgorithm.detailsSignal.connect(self.updateDetails)
         self.geneticAlgorithm.dataSignal.connect(self.updateView)

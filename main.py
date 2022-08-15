@@ -5,8 +5,8 @@ import sys
 
 # Entry point for application
 if __name__ == '__main__':
-    if not db.checkSetup():
-        db.setup()
+    if not db.verConfiguracion():
+        db.configuracion()
     app = QtWidgets.QApplication(sys.argv)
     parent = QtWidgets.QMainWindow()
     Main.MainWindow(parent)
