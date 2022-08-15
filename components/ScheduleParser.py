@@ -12,13 +12,13 @@ class ScheduleParser:
     # table = QTableView, data = []
     def __init__(self, table, data):
         self.table = table
-        header = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']]
+        header = [['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']]
         with open('timeslots.json') as json_file:
             self.timeslots = timeslots = json.load(json_file)['timeslots']
         self.settings = settings = Settings.getSettings()
-        header.append(timeslots[settings['starting_time']:settings['ending_time'] + 1])
+        header.append(timeslots[settings['hora_inicio']:settings['hora_fin'] + 1])
         temporaryData = []
-        for i in range(settings['ending_time'] + 1 - settings['starting_time']):
+        for i in range(settings['hora_fin'] + 1 - settings['hora_inicio']):
             temporaryData.append(['', '', '', '', '', ''])
         self.model = ScheduleParserModel(header, temporaryData)
         table.setModel(self.model)
@@ -43,7 +43,7 @@ class ScheduleParser:
                 model.setData(index, item)
 
     def subjectGenerator(self):
-        print(self.settings['starting_time'])
+        print(self.settings['hora_inicio'])
 
 
 class ScheduleParserModel(TableModel.TableModel):

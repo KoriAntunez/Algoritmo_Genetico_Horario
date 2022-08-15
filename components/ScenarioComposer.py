@@ -8,26 +8,26 @@ class ScenarioComposer:
         self.cursor = self.conn.cursor()
 
     def getInstructors(self):
-        self.cursor.execute('SELECT id, name, hours, schedule FROM instructors WHERE active = 1')
+        self.cursor.execute('SELECT id, name, hours, horario FROM instructors WHERE active = 1')
         instructors = self.listToDictionary(self.cursor.fetchall())
         instructors = self.jsonToList(instructors, 2)
         return instructors
 
     def getRooms(self):
-        self.cursor.execute('SELECT id, name, type, schedule FROM rooms WHERE active = 1')
+        self.cursor.execute('SELECT id, name, type, horario FROM rooms WHERE active = 1')
         rooms = self.listToDictionary(self.cursor.fetchall())
         rooms = self.jsonToList(rooms, 2)
         return rooms
 
     def getSubjects(self):
-        self.cursor.execute('SELECT id, name, hours, code, description, instructors, divisible, type FROM subjects')
+        self.cursor.execute('SELECT id, name, hours, codigo, description, docente, divisible, type FROM asignaturas')
         subjects = self.listToDictionary(self.cursor.fetchall())
         subjects = self.jsonToList(subjects, 4)
         subjects = self.stringToInt(subjects, 4)
         return subjects
 
     def getSections(self):
-        self.cursor.execute('SELECT id, name, schedule, subjects, stay FROM sections WHERE active = 1')
+        self.cursor.execute('SELECT id, name, horario, asignaturas, stay FROM sections WHERE active = 1')
         sections = self.listToDictionary(self.cursor.fetchall())
         sections = self.jsonToList(sections, 1)
         sections = self.jsonToList(sections, 2)
@@ -35,7 +35,7 @@ class ScenarioComposer:
         return sections
 
     def getSharings(self):
-        self.cursor.execute('SELECT id, subjectId, sections FROM sharings WHERE final = 1')
+        self.cursor.execute('SELECT id, asignaturaId, secciones FROM sharings WHERE final = 1')
         sharings = self.listToDictionary(self.cursor.fetchall())
         sharings = self.jsonToList(sharings, 1)
         sharings = self.stringToInt(sharings, 1)

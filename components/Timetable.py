@@ -7,16 +7,16 @@ import json
 class Timetable:
     def __init__(self, table, data=False):
         self.table = table
-        header = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']]
+        header = [['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']]
         with open('timeslots.json') as json_file:
             timeslots = json.load(json_file)['timeslots']
         settings = Settings.getSettings()
-        header.append(timeslots[settings['starting_time']:settings['ending_time'] + 1])
+        header.append(timeslots[settings['hora_inicio']:settings['hora_fin'] + 1])
         self.data = data
         if not data:
             self.data = []
-            for i in range(settings['ending_time'] + 1 - settings['starting_time']):
-                self.data.append(['Available', 'Available', 'Available', 'Available', 'Available', 'Available'])
+            for i in range(settings['hora_fin'] + 1 - settings['hora_inicio']):
+                self.data.append(['Disponible', 'Disponible', 'Disponible', 'Disponible', 'Disponible', 'Disponible'])
         self.model = TimetableModel(header, self.data)
         table.setModel(self.model)
         table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
@@ -30,8 +30,8 @@ class Timetable:
     def toggleCells(self):
         indexes = self.table.selectionModel().selectedIndexes()
         for i in indexes:
-            value = 'Available' if self.data[i.row()][i.column()] == 'Unavailable' else 'Unavailable'
-            if value == 'Available':
+            value = 'Disponible' if self.data[i.row()][i.column()] == 'No Disponible' else 'No Disponible'
+            if value == 'Disponible':
                 self.table.setStyleSheet('selection-background-color: rgb(46, 204, 113); selection-color: black;')
             else:
                 self.table.setStyleSheet('selection-background-color: rgb(231, 76, 60); selection-color: black;')
@@ -50,7 +50,7 @@ class TimetableModel(TableModel.TableModel):
         if not index.isValid():
             return QtCore.QVariant()
         elif role == QtCore.Qt.BackgroundRole:
-            if self.data[index.row()][index.column()] == 'Available':
+            if self.data[index.row()][index.column()] == 'Disponible':
                 return QtGui.QBrush(QtGui.QColor(46, 204, 113))
             else:
                 return QtGui.QBrush(QtGui.QColor(231, 76, 60))
@@ -62,6 +62,6 @@ class TimetableModel(TableModel.TableModel):
 def generateRawTable():
     settings = Settings.getSettings()
     data = []
-    for i in range(settings['ending_time'] + 1 - settings['starting_time']):
-        data.append(['Available', 'Available', 'Available', 'Available', 'Available', 'Available'])
+    for i in range(settings['hora_fin'] + 1 - settings['hora_inicio']):
+        data.append(['Disponible', 'Disponible', 'Disponible', 'Disponible', 'Disponible', 'Disponible'])
     return data

@@ -3,7 +3,7 @@ from components import Database as db
 from containers import Main
 import sys
 
-# Entry point for application
+# Ejecutar la aplicaciòn
 if __name__ == '__main__':
     if not db.checkSetup():
         db.setup()
