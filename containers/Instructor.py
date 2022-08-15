@@ -1,9 +1,10 @@
+#Importacion de la librerias
 from PyQt5 import QtWidgets, QtGui
 from components import Database as db, Timetable
 from py_ui import Instructor as Parent
 import json
 
-
+#Clase donde se crea al instructor
 class Instructor:
     def __init__(self, id):
         self.id = id
@@ -19,7 +20,7 @@ class Instructor:
         parent.btnFinish.clicked.connect(self.finish)
         parent.btnCancel.clicked.connect(self.dialog.close)
         dialog.exec_()
-
+#Funcion donde se muestran de la base de datos los instructores 
     def fillForm(self):
         conn = db.getConnection()
         cursor = conn.cursor()
@@ -30,7 +31,7 @@ class Instructor:
         self.parent.lineEditHours.setText(str(result[1]))
         # Generate timetable from custom schedule
         self.table = Timetable.Timetable(self.parent.tableSchedule, json.loads(result[2]))
-
+#Funcion donde se finaliza el tiempo de trabajo del instructor
     def finish(self):
         # Verification of input
         if not self.parent.lineEditName.text():
@@ -47,7 +48,7 @@ class Instructor:
             data.pop()
         self.insertInstructor(data)
         self.dialog.close()
-
+#Funcion donde se hace la insersión de los instructores en los horarios
     @staticmethod
     def insertInstructor(data):
         conn = db.getConnection()
@@ -60,17 +61,17 @@ class Instructor:
         conn.close()
         return True
 
-
+#Clase donde se crea una estructura arbol de los instructores
 class Tree:
     def __init__(self, tree):
         self.tree = tree
         self.model = model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(['ID', 'Available', 'Name', 'Hours', 'Operation'])
+        model.setHorizontalHeaderLabels(['ID', 'Disponible', 'Nombre', 'Horas', 'Operacion'])
         tree.setModel(model)
         tree.setColumnHidden(0, True)
         model.itemChanged.connect(lambda item: self.toggleAvailability(item))
         self.display()
-
+    #Funcion donde se activa  y avilita a los instructores de acuerdo a estadod
     def toggleAvailability(self, item):
         # Get ID of toggled instructor
         id = self.model.data(self.model.index(item.row(), 0))
@@ -80,7 +81,7 @@ class Tree:
         cursor.execute('UPDATE instructors SET active = ?  WHERE id = ?', [newValue, id])
         conn.commit()
         conn.close()
-
+    #Funcion donde se muestra a los instrutores
     def display(self):
         # Clear model
         self.model.removeRows(0, self.model.rowCount())
@@ -121,11 +122,11 @@ class Tree:
             frameLayout.addWidget(btnDelete)
             # Append the widget group to edit item
             self.tree.setIndexWidget(edit.index(), frameEdit)
-
+    #Funcion donde se puede editar a los instrutores
     def edit(self, id):
         Instructor(id)
         self.display()
-
+    #Funcion donde se borra a los instructores
     def delete(self, id):
         # Show confirm model
         confirm = QtWidgets.QMessageBox()

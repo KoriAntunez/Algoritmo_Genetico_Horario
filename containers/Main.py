@@ -1,10 +1,11 @@
+#Importacion de librerias
 from PyQt5 import QtCore
 from containers import Generate, Instructor, ResultViewer, Room, Subject, Section
 from components import Settings, Database, Timetable, ImportExportHandler as ioHandler
 from py_ui import Main
 import json
 import gc
-
+#Declaracion de la clase principal
 class MainWindow(Main.Ui_MainWindow):
     def __init__(self, parent):
         super().__init__()
@@ -18,7 +19,7 @@ class MainWindow(Main.Ui_MainWindow):
         self.tabWidget.currentChanged.connect(self.tabListener)
         self.tabWidget.setCurrentIndex(0)
 
-    # Connect Main component buttons to respective actions
+    # Conecte los botones del componente principal a las acciones respectivas
     def connectButtons(self):
         self.btnInstrAdd.clicked.connect(lambda: self.openInstructor())
         self.btnRoomAdd.clicked.connect(lambda: self.openRoom())
@@ -35,14 +36,14 @@ class MainWindow(Main.Ui_MainWindow):
         self.actionExit.triggered.connect(exit)
         self.actionNew.triggered.connect(lambda: self.new())
 
-    # Initialize trees and tables
+    # Inicializar árboles y tablas.
     def drawTrees(self):
         self.instrTree = Instructor.Tree(self.treeInstr)
         self.roomTree = Room.Tree(self.treeRoom)
         self.subjTree = Subject.Tree(self.treeSubj)
         self.secTree = Section.Tree(self.treeSec)
 
-    # Handle component openings
+    # Manejar las aberturas de los componentes
 
     def openInstructor(self, id=False):
         Instructor.Instructor(id)
@@ -67,7 +68,7 @@ class MainWindow(Main.Ui_MainWindow):
         self.secTree.display()
         if index == 4:
             self.checkContents()
-
+    #Se revisan todos los componentes del horario
     def checkContents(self):
         conn = Database.getConnection()
         cursor = conn.cursor()
@@ -88,17 +89,17 @@ class MainWindow(Main.Ui_MainWindow):
         self.timeEnding.setDisabled(disabled)
         self.btnScenGenerate.setDisabled(not disabled)
         conn.close()
-
+    #Se Abren los resultados de la generación del horario
     def openResult(self):
         ResultViewer.ResultViewer()
-
+    #Funcion donde de abren las genraciones realizadas
     def openGenerate(self):
         gc.collect()
         result = Generate.Generate()
         if not len(result.topChromosomes):
             return False
         self.openResult()
-
+    #Función de importacion de instructores
     def importInstructors(self):
         instructors = ioHandler.getCSVFile('instructors')
         if instructors:
@@ -108,7 +109,7 @@ class MainWindow(Main.Ui_MainWindow):
             for instructor in instructors:
                 Instructor.Instructor.insertInstructor([instructor[0], float(instructor[1]), blankSchedule])
             self.tabListener(0)
-
+    #Funcion de importe de aulas
     def importRooms(self):
         rooms = ioHandler.getCSVFile('rooms')
         if rooms:
@@ -118,7 +119,7 @@ class MainWindow(Main.Ui_MainWindow):
             for room in rooms:
                 Room.Room.insertRoom([room[0], blankSchedule, room[1]])
             self.tabListener(1)
-
+    #Funcion de importación de cursos
     def importSubjects(self):
         subjects = ioHandler.getCSVFile('subjects')
         if subjects:
@@ -128,15 +129,15 @@ class MainWindow(Main.Ui_MainWindow):
                 Subject.Subject.insertSubject(
                     [subject[1], float(subject[3]), subject[0], '', json.dumps([]), int(subject[4]), subject[2]])
         self.tabListener(2)
-
+    #PErmite guardar el archivo como un tipo y un nombre
     def saveAs(self):
         ioHandler.saveAs()
-
+    #Cargar un archivo de una generacion de horario
     def load(self):
         ioHandler.load()
         self.tabWidget.setCurrentIndex(0)
         self.tabListener(0)
-
+    #Cargar las configuraciones realizadas
     def loadSettings(self):
         self.timeStarting.setTime(QtCore.QTime(int(self.settings['starting_time'] / 2), 0))
         self.timeEnding.setTime(QtCore.QTime(int(self.settings['ending_time'] / 2) + 1, 0))
@@ -163,7 +164,7 @@ class MainWindow(Main.Ui_MainWindow):
         self.matrixSum = sum(matrix.values())
         self.lblTotal.setText('Total: {}%'.format(self.matrixSum))
 
-    # Handle Settings
+# Configuracion de las opciones manuales
     def handleSettings(self):
         self.timeStarting.timeChanged.connect(self.handleStartingTime)
         self.timeEnding.timeChanged.connect(self.handleEndingTime)
