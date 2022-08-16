@@ -30,7 +30,7 @@ class Section:
         # Setup subjects tree view
         self.tree = tree = self.parent.treeSubjects
         self.model = model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(['ID', 'Available', 'Shared', 'Subject Code', 'Subject Name', 'Share ID'])
+        model.setHorizontalHeaderLabels(['ID', 'Disponible', 'Shared', 'Código del Tema', 'Nombre del Tema', 'Share ID'])
         tree.setModel(model)
         tree.setColumnHidden(0, True)
         tree.setColumnHidden(5, True)
@@ -165,7 +165,7 @@ class Tree:
     def __init__(self, tree):
         self.tree = tree
         self.model = model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(['ID', 'Available', 'Name', 'Stay in Room', 'Operation'])
+        model.setHorizontalHeaderLabels(['ID', 'Disponible', 'Nombre', 'Ocupar el Aula', 'Operación'])
         tree.setModel(model)
         tree.setColumnHidden(0, True)
         model.itemChanged.connect(lambda item: self.toggleAvailability(item))
@@ -202,9 +202,9 @@ class Tree:
             edit.setEditable(False)
             self.model.appendRow([id, availability, name, stay, edit])
             frameEdit = QtWidgets.QFrame()
-            btnEdit = QtWidgets.QPushButton('Edit', frameEdit)
+            btnEdit = QtWidgets.QPushButton('Editar', frameEdit)
             btnEdit.clicked.connect(lambda state, id=instr[0]: self.edit(id))
-            btnDelete = QtWidgets.QPushButton('Delete', frameEdit)
+            btnDelete = QtWidgets.QPushButton('Eliminar', frameEdit)
             btnDelete.clicked.connect(lambda state, id=instr[0]: self.delete(id))
             frameLayout = QtWidgets.QHBoxLayout(frameEdit)
             frameLayout.setContentsMargins(0, 0, 0, 0)
@@ -219,8 +219,8 @@ class Tree:
     def delete(self, id):
         confirm = QtWidgets.QMessageBox()
         confirm.setIcon(QtWidgets.QMessageBox.Warning)
-        confirm.setText('Are you sure you want to delete this entry?')
-        confirm.setWindowTitle('Confirm Delete')
+        confirm.setText('Estas seguro que deseas eliminar?')
+        confirm.setWindowTitle('Confirmar')
         confirm.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         result = confirm.exec_()
         if result == 16384:
