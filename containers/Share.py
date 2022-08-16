@@ -1,29 +1,31 @@
+#Importacion de la librerias
 from PyQt5 import QtWidgets, QtGui
 from components import Database as db
 from py_ui import Share as Parent
 import json
 
-
+# Clase que ilustra un horario compartido
 class Share:
     def __init__(self, subject_id, section_id):
         self.id = int(subject_id)
         self.section_id = int(section_id)
         self.shareId = False
         self.shareMembersText = False
-        # New instance of dialog
+        # Nueva instancia de diálogo
         self.dialog = dialog = QtWidgets.QDialog()
-        # Initialize custom dialog
+        # Se inicializa cuadro de diálogo personalizado
         self.parent = parent = Parent.Ui_Dialog()
-        # Add parent to custom dialog
+        # Se agrega clase padre al cuadro de diálogo personalizado
         parent.setupUi(dialog)
+        # Conectando el widget de horario con el modelo de horario personalizado
         self.setSharings()
         parent.btnFinish.clicked.connect(self.finish)
         parent.btnCancel.clicked.connect(self.dialog.close)
         dialog.exec_()
-
+    # Método que obtiene data de la Clase Sharing
     def getShareData(self):
         return tuple([self.shareId, self.shareMembersText])
-
+    #
     def setSharings(self):
         self.tree = tree = self.parent.treeSections
         self.model = model = QtGui.QStandardItemModel()
@@ -34,7 +36,7 @@ class Share:
         model.itemChanged.connect(lambda item: self.toggleSharing(item))
         conn = db.getConnection()
         cursor = conn.cursor()
-        # Get sections with mutual subjects
+        # Obtiene secciones con clases mutuas
         if self.section_id:
             cursor.execute('SELECT id, name, subjects FROM sections WHERE active = 1 AND id != ?', [self.section_id])
         else:
@@ -68,7 +70,7 @@ class Share:
             sectionList.setEditable(False)
             sectionID = QtGui.QStandardItem(','.join(map(str, sectionIDList)))
             self.model.appendRow([id, sectionList, sectionID])
-
+     # Método para editar/eliminar secciones con clases mutuas
     def finish(self):
         if not self.tree.selectedIndexes():
             return False

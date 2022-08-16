@@ -1,19 +1,20 @@
+#Importacion de la librerias
 from PyQt5 import QtWidgets, QtGui
 from components import Database as db, Timetable
 from py_ui import Room as Parent
 import json
 
-
+# Clase donde se crea el Aula de Clases 
 class Room:
     def __init__(self, id):
         self.id = id
-        # New instance of dialog
+        # Nueva instancia de diálogo
         self.dialog = dialog = QtWidgets.QDialog()
-        # Initialize custom dialog
+        # Se inicializa cuadro de diálogo personalizado
         self.parent = parent = Parent.Ui_Dialog()
-        # Add parent to custom dialog
+        # Se agrega clase padre al cuadro de diálogo personalizado
         parent.setupUi(dialog)
-        # Connect timetable widget with custom timetable model
+        # Conectando el widget de horario con el modelo de horario personalizado
         if id:
             self.fillForm()
         else:
@@ -21,7 +22,7 @@ class Room:
         parent.btnFinish.clicked.connect(self.finish)
         parent.btnCancel.clicked.connect(self.dialog.close)
         dialog.exec_()
-
+    # Método donde se muestran las aulas de la base de datos
     def fillForm(self):
         conn = db.getConnection()
         cursor = conn.cursor()
@@ -34,7 +35,7 @@ class Room:
             self.parent.radioLec.setChecked(True)
         else:
             self.parent.radioLab.setChecked(True)
-
+            
     def finish(self):
         if not self.parent.lineEditName.text():
             return False
@@ -45,7 +46,8 @@ class Room:
             data.pop()
         self.insertRoom(data)
         self.dialog.close()
-
+    
+    # Método para insertar/editar un nuevo registro en el formulario
     @staticmethod
     def insertRoom(data):
         conn = db.getConnection()
@@ -57,7 +59,7 @@ class Room:
         conn.commit()
         conn.close()
 
-
+#Clase donde se crea la estructura Arbol de las Aulas de Clases
 class Tree:
     def __init__(self, tree):
         self.tree = tree
@@ -67,7 +69,7 @@ class Tree:
         tree.setColumnHidden(0, True)
         model.itemChanged.connect(lambda item: self.toggleAvailability(item))
         self.display()
-
+    # Método donde se activa y habilita las aulas de clases de acuerdo a su estado
     def toggleAvailability(self, item):
         id = self.model.data(self.model.index(item.row(), 0))
         newValue = 1 if item.checkState() == 2 else 0
@@ -76,7 +78,7 @@ class Tree:
         cursor.execute('UPDATE rooms SET active = ?  WHERE id = ?', [newValue, id])
         conn.commit()
         conn.close()
-
+    # Método donde se muestra las aulas de clases creadas
     def display(self):
         self.model.removeRows(0, self.model.rowCount())
         conn = db.getConnection()
@@ -97,25 +99,25 @@ class Tree:
             edit.setEditable(False)
             self.model.appendRow([id, availability, name, edit])
             frameEdit = QtWidgets.QFrame()
-            btnEdit = QtWidgets.QPushButton('Edit', frameEdit)
+            btnEdit = QtWidgets.QPushButton('Editar', frameEdit)
             btnEdit.clicked.connect(lambda state, id=entry[0]: self.edit(id))
-            btnDelete = QtWidgets.QPushButton('Delete', frameEdit)
+            btnDelete = QtWidgets.QPushButton('Eliminar', frameEdit)
             btnDelete.clicked.connect(lambda state, id=entry[0]: self.delete(id))
             frameLayout = QtWidgets.QHBoxLayout(frameEdit)
             frameLayout.setContentsMargins(0, 0, 0, 0)
             frameLayout.addWidget(btnEdit)
             frameLayout.addWidget(btnDelete)
             self.tree.setIndexWidget(edit.index(), frameEdit)
-
+    # Método para editar un aula de clases
     def edit(self, id):
         Room(id)
         self.display()
-
+    # Método para eliminar un aula de clases
     def delete(self, id):
         confirm = QtWidgets.QMessageBox()
         confirm.setIcon(QtWidgets.QMessageBox.Warning)
-        confirm.setText('Are you sure you want to delete this entry?')
-        confirm.setWindowTitle('Confirm Delete')
+        confirm.setText('¿Está seguro de que desea eliminar este registro?')
+        confirm.setWindowTitle('Confirmar eliminación')
         confirm.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         result = confirm.exec_()
         if result == 16384:

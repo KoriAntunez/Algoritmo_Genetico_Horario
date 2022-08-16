@@ -1,3 +1,4 @@
+#Importacion de la librerias
 from PyQt5 import QtWidgets, QtGui
 from components import Database as db
 from py_ui import Subject as Parent
@@ -7,11 +8,11 @@ import json
 class Subject:
     def __init__(self, id):
         self.id = id
-        # New instance of dialog
+        # Nueva instancia de diálogo
         self.dialog = dialog = QtWidgets.QDialog()
-        # Initialize custom dialog
+        # Se inicializa cuadro de diálogo personalizado
         self.parent = parent = Parent.Ui_Dialog()
-        # Add parent to custom dialog
+        # Se agrega clase padre al cuadro de diálogo personalizado
         parent.setupUi(dialog)
         parent.radioLec.setChecked(True)
         parent.radioYes.setChecked(True)
@@ -21,7 +22,7 @@ class Subject:
         parent.btnFinish.clicked.connect(self.finish)
         parent.btnCancel.clicked.connect(self.dialog.close)
         dialog.exec_()
-
+    # Método donde se muestran las asignaturas de la base de datos
     def fillForm(self):
         conn = db.getConnection()
         cursor = conn.cursor()
@@ -42,7 +43,7 @@ class Subject:
             self.parent.radioLab.setChecked(True)
         else:
             self.parent.radioAny.setChecked(True)
-
+    # Método para asignar el docente/instructor a la asignatura
     def setupInstructors(self):
         self.tree = tree = self.parent.treeSchedule
         self.model = model = QtGui.QStandardItemModel()
@@ -99,7 +100,8 @@ class Subject:
             data.pop()
         self.insertSubject(data)
         self.dialog.close()
-
+        
+    # Método para insertar/editar un nuevo registro en el formulario
     @staticmethod
     def insertSubject(data):
         conn = db.getConnection()
@@ -116,6 +118,7 @@ class Subject:
         conn.close()
 
 
+#Clase donde se crea la estructura Arbol de las Asignaturas
 class Tree:
     def __init__(self, tree):
         self.tree = tree
@@ -124,7 +127,7 @@ class Tree:
         tree.setModel(model)
         tree.setColumnHidden(0, True)
         self.display()
-
+    # Método donde se muestra las asignaturas creadas
     def display(self):
         self.model.removeRows(0, self.model.rowCount())
         conn = db.getConnection()
@@ -167,11 +170,11 @@ class Tree:
             frameLayout.addWidget(btnEdit)
             frameLayout.addWidget(btnDelete)
             self.tree.setIndexWidget(edit.index(), frameEdit)
-
+    # Método para editar una asignatura
     def edit(self, id):
         Subject(id)
         self.display()
-
+    # Método para eliminar una asignatura
     def delete(self, id):
         confirm = QtWidgets.QMessageBox()
         confirm.setIcon(QtWidgets.QMessageBox.Warning)
