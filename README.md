@@ -1,6 +1,3 @@
-# University Timetable Scheduling Using Metaheuristic Adaptive-Elitist Genetic Algorithm
-A research on creation of metaheuristic university class timetable scheduling solution.
-
 ### Installation:
 1. Clone repository.
 3. Ensure all dependencies are installed.
